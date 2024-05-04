@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres_db_univ:
+    image: postgres:latest
+    container_name: pg_db_univ
+    restart: always
+    environment:
+      - POSTGRES_DB=univ
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - '127.0.0.1:5434:5432'
+    volumes:
+      - postgres_db_univ3:/var/lib/postgresql/data/pgdata
+
+volumes:
+  postgres_db_univ3:
