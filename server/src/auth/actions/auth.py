@@ -9,7 +9,7 @@ from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src import config
+from src.config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 from src.db.dals.UsersDAL import UsersDAL
 from src.db.models.users import Users
 from src.db.session import get_db
@@ -19,10 +19,10 @@ from src.auth.security import create_access_token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/universityAdministration/api/v1/token")
 
 
-async def _get_user_by_email_for_auth(email: str, session: AsyncSession):
+async def _get_user_by_email_for_auth(login: str, session: AsyncSession):
     async with session.begin():
         user_dal = UsersDAL(session)
-        return await user_dal.get_user_by_login(login=email)
+        return await user_dal.get_user_by_login(login=login)
 
 
 async def get_current_user_from_token(token: str = Depends(oauth2_scheme),
@@ -32,23 +32,22 @@ async def get_current_user_from_token(token: str = Depends(oauth2_scheme),
         detail="Could not validate credentials",
     )
     try:
-        payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        login: str = payload.get("sub")
+        if login is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = await _get_user_by_email_for_auth(email=email, session=db)
+    user = await _get_user_by_email_for_auth(login=login, session=db)
     if user is None:
         raise credentials_exception
     return user
 
 
-
 async def authenticate_user(
-        email: str, password: str, db: AsyncSession
+        login: str, password: str, db: AsyncSession
 ) -> Union[Users, None]:
-    user = await _get_user_by_email_for_auth(email=email, session=db)
+    user = await _get_user_by_email_for_auth(login=login, session=db)
     if user is None:
         return
     if not Hasher.verify_password(password, user.hashed_password):
@@ -56,10 +55,10 @@ async def authenticate_user(
     return user
 
 
-async def _gen_access_token(email):
-    access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+async def _gen_access_token(login):
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": email, "other_custom_data": [1, 2, 3, 4]},
+        data={"sub": login, "other_custom_data": [1, 2, 3, 4]},
         expires_delta=access_token_expires,
     )
     return access_token

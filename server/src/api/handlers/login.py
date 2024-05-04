@@ -16,7 +16,7 @@ from src.auth.security import create_access_token
 login_router = APIRouter()
 
 
-@login_router.post("", response_model=Token)
+@login_router.post("/token", response_model=Token)
 async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(),
         db: AsyncSession = Depends(get_db)

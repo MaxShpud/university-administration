@@ -139,11 +139,3 @@ async def get_current_user(
 #             detail="User not found."
 #         )
 #     return user
-
-
-# @user_router.get("/current", response_model=CurrentUserInfo)
-# async def get_current_user(
-#         db: AsyncSession = Depends(get_db),
-#         user: Users = Depends(get_current_user_from_token)
-# ):
-#     return await _get_current_user_info(user, db)

@@ -7,9 +7,9 @@ from src.api.handlers.auth import user_router
 
 app = FastAPI(title="University administration")
 
-main_api_router = APIRouter(prefix='/universityAdministration/api/v1')
+main_api_router = APIRouter(prefix='/api')
 
-main_api_router.include_router(login_router, prefix="/token", tags=["Token"])
+main_api_router.include_router(login_router, prefix="/login", tags=["Token"])
 main_api_router.include_router(user_router, prefix="/user", tags=["AUTH"])
 
 app.include_router(main_api_router)
