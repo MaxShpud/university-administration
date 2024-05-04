@@ -73,18 +73,4 @@ async def _create_new_user(body: UserCreate, session) -> ShowUser:
 #     return True
 #
 #
-# async def _get_current_user_info(user, db) -> CurrentUserInfo:
-#     minio = MinioTool()
-#     file_id = await _get_file_id_by_user_id(user_id=user.id, session=db)
-#     file_name = await _get_file_name_by_file_id(file_id=file_id, session=db)
-#     file_base64 = await minio.download_file(file_id=file_id, file_name=file_name)
-#     return CurrentUserInfo(
-#         id=user.id,
-#         name=user.name,
-#         surname=user.surname,
-#         email=user.email,
-#         phone_number=user.phone_number,
-#         about_me=user.phone_number,
-#         photo_base64=file_base64,
-#         photo_id=file_id
-#     )
+
