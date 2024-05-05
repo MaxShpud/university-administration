@@ -16,7 +16,7 @@ from src.db.session import get_db
 from src.auth.hasher import Hasher
 from src.auth.security import create_access_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/universityAdministration/api/v1/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login/token")
 
 
 async def _get_user_by_email_for_auth(login: str, session: AsyncSession):

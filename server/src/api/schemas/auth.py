@@ -14,6 +14,7 @@ class User:
     surname = Field(description='Фамилия', example="")
     name = Field(description='Имя', example="")
     patronymic = Field(description='Фамилия', example="")
+    password = Field(description='Пароль', example="12321Max")
     role = Field(description='Роль', example="ADMIN")
 
 
