@@ -13,7 +13,7 @@ async def _create_new_user(body: UserCreate, session) -> ShowUser:
     if await users_dal.check_existing_login(body.login):
         raise HTTPException(
             status_code=400,
-            detail="Login already exists"
+            detail="Логин уже занят"
         )
     user = await users_dal.create_user(
         login=body.login,
