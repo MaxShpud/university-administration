@@ -12,12 +12,17 @@ import {Paper,
     Title,
     Text,
     Anchor,
-    CloseButton
+    CloseButton,
+    Notification,
+     rem,
 } from '@mantine/core';
 import { IconAt } from '@tabler/icons-react';
 import classes from './AuthenticationImage.module.css';
+import { IconX, IconCheck } from '@tabler/icons-react';
 
 const SignIn = ({theme, setTheme}) => {
+  const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
+  const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
@@ -25,8 +30,27 @@ const SignIn = ({theme, setTheme}) => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const containsOnlyLatinLetters = (input) => {
+    return /^[a-zA-Z]*$/.test(input);
+  };
+
+  const containsOnlyLatinCharacters = (input) => {
+    return /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]*$/.test(input);
+  };
 
   const submitLogin = async () => {
+    if (!containsOnlyLatinLetters(login)) {
+      setErrorMessage('Логин должен содержать только латинские буквы');
+      setTimeout(() => setErrorMessage(''), 5000);
+      return;
+    }
+    if (!containsOnlyLatinCharacters(password)) {
+      setErrorMessage('Пароль должен содержать только латинские символы');
+      setTimeout(() => setErrorMessage(''), 5000);
+      return;
+    }
+    
+
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -71,10 +95,12 @@ const SignIn = ({theme, setTheme}) => {
               style={{ display: login ? undefined : 'none' }}
             />
           }
+          required
         />
         <PasswordInput label="Пароль" placeholder="Введите ваш пароль" mt="md" size="md" 
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
         />
 
         <Button fullWidth mt="xl" size="md" variant="gradient"
@@ -90,7 +116,12 @@ const SignIn = ({theme, setTheme}) => {
                 Зарегистрироваться
             </Anchor>
             </Text>
-
+            {errorMessage && <Notification icon={xIcon} 
+                color="red" withBorder  title="Ошибка!" 
+                style={{ position: 'fixed', top: '20px', right: '20px' }} 
+                >
+                    {errorMessage}
+                </Notification>}
       </Paper>
     </div>
     );
