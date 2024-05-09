@@ -20,10 +20,10 @@ export const UserProvider = (props) => {
       };
 
       const response = await fetch("/user/me", requestOptions)
-  
+      
       if (!response.ok) {
-        setUserData({ token: null, userRole: null });
-      }
+        setUserData({ token: null, userRole: null});
+      } 
       localStorage.setItem("token", userData.token);
       localStorage.setItem("role", userData.userRole)
     };
