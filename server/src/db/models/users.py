@@ -7,14 +7,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.db.models.CONFIG import idpk, active, created_at, deactivated_at
+from src.db.models.CONFIG import idpk, active, created_at, deactivated_at, alias
 from src.db.session import Base
 from enum import Enum, unique
+from src.db.models.statistics import Statistics
 
 @unique
 class Roles(str, Enum):
     DEAN = "DEAN"
-    RECTOR = "RECTOR"
     HEAD_OF_THE_DEPARTMENT = "HEAD_OF_THE_DEPARTMENT"
     ADMIN = "ADMIN"
 
@@ -25,8 +25,7 @@ class Users(Base):
     }
 
     id: Mapped[idpk]
-    alias: Mapped[uuid.UUID] = mapped_column(nullable=False, unique=True,
-                                             comment='Универсальный уникальный идентификатор')
+    alias: Mapped[alias]
     login: Mapped[str] = mapped_column(String(30), unique=True, nullable=False, comment='Логин')
     hashed_password: Mapped[str] = mapped_column(String, nullable=False, comment='Пароль')
     surname: Mapped[str] = mapped_column(String(60), nullable=False, comment='Фамилия')
@@ -36,3 +35,5 @@ class Users(Base):
     active: Mapped[active]
     created_at: Mapped[created_at]
     deactivated_at: Mapped[deactivated_at]
+
+    statistic = relationship("Statistics", back_populates="user")
