@@ -13,7 +13,7 @@ import {Paper,
     Text,
     Anchor,
     CloseButton,
-    Notification,
+    Notification, Modal,FocusTrap ,
      rem,
 } from '@mantine/core';
 import { IconAt } from '@tabler/icons-react';
@@ -49,8 +49,6 @@ const SignIn = ({theme, setTheme}) => {
       setTimeout(() => setErrorMessage(''), 5000);
       return;
     }
-    
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -63,6 +61,7 @@ const SignIn = ({theme, setTheme}) => {
     const data = await response.json();
     if (!response.ok) {
       setErrorMessage(data.detail)
+      setTimeout(() => setErrorMessage(''), 5000);
     } else {
       setUserData({ token: data.access_token, userRole: data.role})
 
@@ -89,6 +88,7 @@ const SignIn = ({theme, setTheme}) => {
         onChange={(event) => setLogin(event.currentTarget.value)}
         rightSectionPointerEvents="all"
         mt="md"
+        radius="md"
         rightSection={
             <CloseButton
               onClick={() => setLogin('')}
@@ -97,19 +97,19 @@ const SignIn = ({theme, setTheme}) => {
           }
           required
         />
-        <PasswordInput label="Пароль" placeholder="Введите ваш пароль" mt="md" size="md" 
+        <PasswordInput label="Пароль" placeholder="Введите ваш пароль" mt="md" size="md" radius="md"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
         />
 
-        <Button fullWidth mt="xl" size="md" variant="gradient"
+        <Button fullWidth mt="xl" size="md" variant="gradient" radius="md"
          gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
            type="submit"
            onClick={handleSubmit}>
           Авторизоваться
         </Button>
-
+        
         <Text ta="center" mt="md">
             Нет аккаунта?{' '}
             <Anchor fw={700} onClick={() => navigate('register', {replace: false})}>
@@ -122,6 +122,7 @@ const SignIn = ({theme, setTheme}) => {
                 >
                     {errorMessage}
                 </Notification>}
+              
       </Paper>
     </div>
     );

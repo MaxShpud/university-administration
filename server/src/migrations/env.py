@@ -8,7 +8,7 @@ from src.db.session import Base
 from src.config import DB_URL
 from src.db.models import (
 users,
-
+statistics
 )
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
