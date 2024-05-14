@@ -16,12 +16,11 @@ import {Paper,
      rem,
      LoadingOverlay,
     Select,
-    AppShell, Burger, Group, Skeleton, Table, Modal, FocusTrap, FileButton, Drawer, Flex, ActionIcon 
+    AppShell, Burger, Group, Skeleton, Table, Modal, FocusTrap, FileButton, Drawer, Flex, ActionIcon, NumberInput
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import './Home.css'
-import { IconLogout  } from '@tabler/icons-react';
-import exit_btn from "../../assets/exit_btn.svg" 
+import { IconLogout, IconEdit, IconTrash } from '@tabler/icons-react';
 import { IconX, IconCheck } from '@tabler/icons-react';
 
 const text = "Отсутствие актов о нарушении санитарного состояния, пожарной безопасности, охраны труда и других актов противоправных действий (в том числе административные и уголовные преступления, нарушения правил внутреннего трудового распорядка, пропускного режима с использованием СКУД и иных) в отношении работников, обучающихся и проживающих в общежитиях (по факультету)"
@@ -53,7 +52,6 @@ const Home = ({theme, setTheme}) => {
     const navigate = useNavigate()
     const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
     const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
-    //const [opened, { toggle }] = useDisclosure();
     const [statistics, setStatistics] = useState([]);
     const [createdStatistic, setCreatedStatistic] = useState({
       indicators: "",
@@ -61,15 +59,29 @@ const Home = ({theme, setTheme}) => {
       value_of_indicators: "",
       max_amount_of_additional_bonus: "",
       note: "",
-      proposed_amount_of_additional_bonus: "",
+      proposed_amount_of_additional_bonus: 0,
     })
     const [month, setMonth] = useState("Январь");
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
     const [opened, { open, close }] = useDisclosure(false);
+    const [changeDisclosure, { open: openChange, close: closeChange }] = useDisclosure(false);
+    const [deleteDisclosure, { open: openDelete, close: closeDelete }] = useDisclosure(false);
     const [successAdded, setSuccessAdded] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
-    
+    const [changedStatistic, setChangedStatistic] = useState({
+      alias: "",
+      indicators: "",
+      control_period: "",
+      value_of_indicators: "",
+      max_amount_of_additional_bonus: "",
+      note: "",
+      proposed_amount_of_additional_bonus: 0,
+    })
+    const [deleteStatistic, setDeteletedStatistic] = useState("")
+    const isAdmin = userData.userRole === "ADMIN";
+    const isDean = userData.userRole === "DEAN";
+    const isHeadOfDepartment = userData.userRole === "HEAD_OF_THE_DEPARTMENT";
     if (!userData.token) {
       navigate('/', {replace: true})
     }
@@ -98,6 +110,33 @@ const Home = ({theme, setTheme}) => {
         fetchMarkers();
     }, [month])
 
+    const EditButton = ({ rowData, onEdit, onDelete  }) => (
+      <Flex gap="10px">
+        <IconEdit className="EditButton" onClick={() => onEdit(rowData)} variant="filled" color="orange">Редактировать</IconEdit>
+        {(userData.userRole === "ADMIN" || userData.userRole === "DEAN") && (
+        <IconTrash className="EditButton" onClick={() => onDelete(rowData)} variant="filled" color="rgba(255, 158, 158, 1)">Удалить</IconTrash>
+      )}
+      </Flex>
+    );
+    
+    const handleEditButtonClick = (rowData) => {
+      setChangedStatistic({
+        alias: rowData.alias,
+        indicators: rowData.indicators,
+        control_period: rowData.control_period,
+        value_of_indicators: rowData.value_of_indicators,
+        max_amount_of_additional_bonus: rowData.max_amount_of_additional_bonus,
+        note: rowData.note,
+        proposed_amount_of_additional_bonus: rowData.proposed_amount_of_additional_bonus,
+      });
+      openChange();
+    };
+
+    const handleDeleteButtonClick = (alias) => {
+      setDeteletedStatistic(alias)
+      openDelete();
+    };
+
     const rows = statistics.map((element, index) => (
         <Table.Tr key={element.alias}>
             <Table.Td style={{ border: '1px solid #000', padding: '8px' }}>{index + 1}</Table.Td>
@@ -106,11 +145,22 @@ const Home = ({theme, setTheme}) => {
             <Table.Td style={{ border: '1px solid #000', padding: '8px' }}>{element.value_of_indicators}</Table.Td>
             <Table.Td style={{ border: '1px solid #000', padding: '8px' }}>{element.max_amount_of_additional_bonus}</Table.Td>
             <Table.Td style={{ border: '1px solid #000', padding: '8px' }}>{element.note}</Table.Td>
-            <Table.Td style={{ border: '1px solid #000', padding: '8px' }}>{element.proposed_amount_of_additional_bonus}</Table.Td>
+            <Table.Td style={{ border: '1px solid #000', padding: '8px' }}>{element.proposed_amount_of_additional_bonus} %</Table.Td>
+            <Table.Td>
+              <EditButton rowData={element} onEdit={handleEditButtonClick} onDelete={() => handleDeleteButtonClick(element.alias)}/>
+            </Table.Td>
         </Table.Tr>
       ));
     
-    
+      
+      const handleInputEditChange = (e) => {
+        const { name, value } = e.target;
+        setChangedStatistic((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }));
+      };
+
       const handleInputChange = (e) => {
         const { name, value } = e.target;
         setCreatedStatistic((prevData) => ({
@@ -118,9 +168,11 @@ const Home = ({theme, setTheme}) => {
           [name]: value,
         }));
       };
-    
+      
+
       const handleSubmit = async () => {
         try {
+          console.log("FDFDFD", createdStatistic)
           const requestOptions = {
             method: "POST",
             headers: {"Content-Type": "application/json", Authorization: `Bearer ${userData.token}`},
@@ -134,7 +186,6 @@ const Home = ({theme, setTheme}) => {
             })
         };
         const response = await fetch("/api/statistic", requestOptions);
-        const data = await response.json();
       
           if (response.ok) {  
             setSuccessAdded("Запись успешно добавлена!")
@@ -167,9 +218,87 @@ const Home = ({theme, setTheme}) => {
       setUserData({ token: null, userRole: null });
       navigate('/', {replace: true})
     }
+
+
+    const handleChangeStatistic = async () => {
+      try {
+        const requestOptions = {
+          method: "PUT",
+          headers: {"Content-Type": "application/json", Authorization: `Bearer ${userData.token}`},
+          body: JSON.stringify({
+            indicators: changedStatistic.indicators,
+            control_period: changedStatistic.control_period,
+            value_of_indicators: changedStatistic.value_of_indicators,
+            max_amount_of_additional_bonus: changedStatistic.max_amount_of_additional_bonus,
+            note: changedStatistic.note,
+            proposed_amount_of_additional_bonus: changedStatistic.proposed_amount_of_additional_bonus,
+          })
+      };
+      const response = await fetch(`/api/statistic/${changedStatistic.alias}`, requestOptions);
+    
+        if (response.ok) {  
+          setSuccessAdded("Запись успешно изменена!")
+              setTimeout(() => {
+                setSuccessAdded('');
+              }, 4000);
+        } else {
+            console.error('Failed')
+        }
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTimeout(() => setErrorMessage(''), 5000);
+    }
+    finally{
+      setChangedStatistic({
+        alias: "",
+        indicators: "",
+        control_period: "",
+        value_of_indicators: "",
+        max_amount_of_additional_bonus: "",
+        note: "",
+        proposed_amount_of_additional_bonus: "",
+    });  
+    }
+      close();
+    };
+
+    const handleDeleteStatistic = async () => {
+      try {
+        const requestOptions = {
+          method: "DELETE",
+          headers: {"Content-Type": "application/json", Authorization: `Bearer ${userData.token}`},
+        };
+        const response = await fetch(`/api/statistic/${deleteStatistic}`, requestOptions);
+      
+          if (response.ok) {  
+            setSuccessAdded("Запись успешно удалена!")
+                setTimeout(() => {
+                  setSuccessAdded('');
+                }, 4000);
+          } else {
+              console.error('Failed')
+          }
+      } catch (error) {
+        setErrorMessage(error.message);
+        setTimeout(() => setErrorMessage(''), 5000);
+      }
+      close();
+    }
+
+    const totalProposedBonus = statistics.reduce((total, element) => total + element.proposed_amount_of_additional_bonus, 0);
+
+    const totalRow = (
+        <Table.Tr key="total">
+            <Table.Td colSpan={6} style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Итого:</Table.Td>
+            <Table.Td style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>{totalProposedBonus} %</Table.Td>
+        </Table.Tr>
+    );
+
+    const rowsWithTotal = [totalRow];
+
+
     return (
       <>
-        
           <AppShell
           header={{ height: 80 }}
           navbar={{
@@ -199,7 +328,7 @@ const Home = ({theme, setTheme}) => {
         </AppShell.Header>
         
         <AppShell.Navbar p="md" style={{ borderBottom: '2px solid black' }}>
-          
+        <Text fw={300}>Меню</Text>
         <Modal opened={opened} onClose={() => {
               close();
               setCreatedStatistic({
@@ -257,24 +386,149 @@ const Home = ({theme, setTheme}) => {
               onChange={handleInputChange}
               mt="sm"
             />
-            <TextInput
+            <NumberInput
               label="Предлагаемый размер доп. премии"
               placeholder="Введите предлагаемый размер доп. премии"
               name="proposed_amount_of_additional_bonus"
+              variant="filled"
               value={createdStatistic.proposed_amount_of_additional_bonus}
-              onChange={handleInputChange}
+              onChange={(value) => setCreatedStatistic((prevData) => ({
+                ...prevData,
+                proposed_amount_of_additional_bonus: value,
+            }))}
               mt="sm"
             />
           </>
         )}
         
         <Box mt="md">
-          
+        
             <Button onClick={handleSubmit} variant="filled" color="teal">Создать</Button>
-          
+        
         </Box>
           </Modal>
-          <Button onClick={open} variant="filled" color="teal">Создать запись</Button>
+          <Modal
+              opened={changeDisclosure}
+              onClose={() => {
+                closeChange();
+              }}
+              title="Редактирование записи"
+            >
+              {userData.userRole === "ADMIN" && (
+                <>
+                    <TextInput
+                      label="Показатель"
+                      placeholder="Введите показатель"
+                      name="indicators"
+                      value={changedStatistic.indicators}
+                      onChange={handleInputEditChange}
+                      mt="sm"
+                    />
+                    <Select
+                    label="Период контроля (отчетный)"
+                    placeholder="Выберите период контроля"
+                    data={MONTHS}
+                    value={changedStatistic.control_period}
+                    onChange={(value) => setChangedStatistic((prevData) => ({
+                      ...prevData,
+                      control_period: value,
+                  }))}
+                  />
+          
+                  <TextInput
+                    label="Значения показателей"
+                    placeholder="Введите значения показателей"
+                    name="value_of_indicators"
+                    value={changedStatistic.value_of_indicators}
+                    onChange={handleInputEditChange}
+                    mt="sm"
+                  />
+                  <TextInput
+                    label="Макс. размер доп. премии (в % от оклада)"
+                    placeholder="Введите макс. размер доп. премии "
+                    name="max_amount_of_additional_bonus"
+                    value={changedStatistic.max_amount_of_additional_bonus}
+                    onChange={handleInputEditChange}
+                    mt="sm"
+                  />
+                  <TextInput
+                    label="Примечание"
+                    placeholder="Введите примечание"
+                    name="note"
+                    value={changedStatistic.note}
+                    onChange={handleInputEditChange}
+                    mt="sm"
+                  />
+                  <NumberInput
+                    label="Предлагаемый размер доп. премии"
+                    placeholder="Введите предлагаемый размер доп. премии"
+                    name="proposed_amount_of_additional_bonus"
+                    value={changedStatistic.proposed_amount_of_additional_bonus}
+                    onChange={handleInputEditChange}
+                    mt="sm"
+                      />
+                </>
+              )}
+              {userData.userRole === "DEAN" && (
+                <>
+                <TextInput
+                      label="Показатель"
+                      placeholder="Введите показатель"
+                      name="indicators"
+                      value={changedStatistic.indicators}
+                      onChange={handleInputEditChange}
+                      mt="sm"
+                    />
+                    <Select
+                    label="Период контроля (отчетный)"
+                    placeholder="Выберите период контроля"
+                    data={MONTHS}
+                    value={changedStatistic.control_period}
+                    onChange={(value) => setChangedStatistic((prevData) => ({
+                      ...prevData,
+                      control_period: value,
+                  }))}/>
+                </>
+              )}
+              {userData.userRole === "HEAD_OF_THE_DEPARTMENT" && (
+                <>
+                  <TextInput
+                    label="Макс. размер доп. премии (в % от оклада)"
+                    placeholder="Введите макс. размер доп. премии "
+                    name="max_amount_of_additional_bonus"
+                    value={changedStatistic.max_amount_of_additional_bonus}
+                    onChange={handleInputEditChange}
+                    mt="sm"
+                  />
+                  <NumberInput
+                    label="Предлагаемый размер доп. премии"
+                    placeholder="Введите предлагаемый размер доп. премии"
+                    name="proposed_amount_of_additional_bonus"
+                    value={changedStatistic.proposed_amount_of_additional_bonus}
+                    onChange={handleInputEditChange}
+                    mt="sm"
+                      />
+                </>
+              )}
+            <Box mt="md">            
+                <Button onClick={handleChangeStatistic} variant="filled" color="teal">Сохранить</Button>
+            </Box>
+            </Modal>
+            <Modal
+              opened={deleteDisclosure}
+              onClose={() => {
+                closeDelete();
+              }}
+              title="Удаление записи"
+            >
+              <Text fw={300}>Удалить запись?</Text>
+            <Box mt="md">
+                <Button onClick={handleDeleteStatistic} variant="filled" color="rgba(255, 158, 158, 1)">Удалить</Button>             
+            </Box>
+            </Modal>
+            {(userData.userRole === "ADMIN" || userData.userRole === "DEAN") && (
+          <Button onClick={open} variant="filled" color="teal" mt="sm">Создать запись</Button>
+            )}
         </AppShell.Navbar>
            
             <AppShell.Main style={{ borderBottom: '2px solid black' }}>
@@ -290,7 +544,7 @@ const Home = ({theme, setTheme}) => {
             <Table.ScrollContainer >
                 <Table>
                       <Table.Thead>
-                        <Table.Tr style={{ border: '1px solid #000', padding: '8px' }}>
+                        <Table.Tr >
                             <Table.Th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>№</Table.Th>
                             <Table.Th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Показатели</Table.Th>
                             <Table.Th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Период контроля (отчетный)</Table.Th>
@@ -299,8 +553,11 @@ const Home = ({theme, setTheme}) => {
                             <Table.Th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Примечание</Table.Th>
                             <Table.Th style={{ border: '1px solid #000', padding: '8px', textAlign: 'center' }}>Предлагаемый размер доп. премии</Table.Th>
                         </Table.Tr>
-                    </Table.Thead>
+                    </Table.Thead>                 
                     <Table.Tbody>{rows}</Table.Tbody>
+                    <Table.Tbody>
+                        {rowsWithTotal} {/* Отображаем строки таблицы, включая строку с суммой */}
+                    </Table.Tbody>
                 </Table>               
             </Table.ScrollContainer>      
             </AppShell.Main>  

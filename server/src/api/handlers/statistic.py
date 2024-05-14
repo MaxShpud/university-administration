@@ -22,6 +22,7 @@ from src.services.statistic import _create_statistic
 from src.services.statistic import _get_statistic
 from src.services.statistic import _get_statistic_by_control_period
 from src.services.statistic import _update_statistic
+from src.services.statistic import _deactivate_statistic
 
 statistic_router = APIRouter()
 
@@ -79,6 +80,19 @@ async def update_statistic(
     try:
         updated_data = data.dict(exclude_unset=True)
         await _update_statistic(updated_data, statistic_alias, db)
+    except HTTPException as error:
+        raise HTTPException(
+            status_code=500, detail=f"Server error: {error}"
+        )
+
+@statistic_router.delete("/{statistic_alias}")
+async def deactivate_statistic(
+        statistic_alias: str,
+        db: AsyncSession = Depends(get_db),
+        current_user: Users = Depends(get_current_user_from_token)
+):
+    try:
+        await _deactivate_statistic(statistic_alias, db)
     except HTTPException as error:
         raise HTTPException(
             status_code=500, detail=f"Server error: {error}"

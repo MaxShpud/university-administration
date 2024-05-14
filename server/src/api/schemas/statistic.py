@@ -16,7 +16,7 @@ class Statistic:
     max_amount_of_additional_bonus = Field(description='Максимальный размер доп премии (в % от оклада)', example="5%")
     note = Field(description='Примечание',
                  example="устанавливается и выплачивается ежемесячно, в течение квартала, следующего за отчетным")
-    proposed_amount_of_additional_bonus = Field(description='Предпалагаемый размер дополнительной премии', example="5%")
+    proposed_amount_of_additional_bonus = Field(description='Предпалагаемый размер дополнительной премии', example=5)
     active = Field(description="", example=True)
     created_at = Field(description="", example="2024-03-29 13:16:06.670")
     deactivated_at = Field(description="", example="2024-03-29 13:16:06.670")
@@ -29,7 +29,7 @@ class CreateStatistic(BaseModel):
     value_of_indicators: Optional[str] = Statistic.value_of_indicators
     max_amount_of_additional_bonus: Optional[str] = Statistic.max_amount_of_additional_bonus
     note: Optional[str] = Statistic.note
-    proposed_amount_of_additional_bonus: Optional[str] = Statistic.proposed_amount_of_additional_bonus
+    proposed_amount_of_additional_bonus: Optional[int] = Statistic.proposed_amount_of_additional_bonus
 
 
 class ResponseStatistic(BaseModel):
@@ -39,7 +39,7 @@ class ResponseStatistic(BaseModel):
     value_of_indicators: str = Statistic.value_of_indicators
     max_amount_of_additional_bonus: str = Statistic.max_amount_of_additional_bonus
     note: str = Statistic.note
-    proposed_amount_of_additional_bonus: str = Statistic.proposed_amount_of_additional_bonus
+    proposed_amount_of_additional_bonus: int = Statistic.proposed_amount_of_additional_bonus
     user_id: int = Statistic.user_id
 
 
@@ -53,4 +53,4 @@ class UpdateStatistic(BaseModel):
     value_of_indicators: Optional[str] = None
     max_amount_of_additional_bonus: Optional[str] = None
     note: Optional[str] = None
-    proposed_amount_of_additional_bonus: Optional[str] = None
+    proposed_amount_of_additional_bonus: Optional[int] = None

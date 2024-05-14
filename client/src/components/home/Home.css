@@ -82,4 +82,8 @@
     border: none;
     border-top: 1px solid #ccc;
   }
+
+  .EditButton {
+    cursor: pointer;
+  }
   
