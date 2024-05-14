@@ -66,3 +66,11 @@ class StatisticsDAL:
         await self.db_session.execute(query)
         await self.db_session.commit()
 
+    async def deactivate_statistic(self, alias):
+        query = (
+            update(Statistics)
+            .where(and_(Statistics.alias == alias, Statistics.active == True))
+            .values(active=False)
+        )
+        await self.db_session.execute(query)
+        await self.db_session.commit()
