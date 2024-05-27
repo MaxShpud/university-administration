@@ -42,7 +42,7 @@ const SighUp = ({theme, setTheme}) => {
     const [role, setRole] = useState("")
     const ROLES = [
         { label: "Декан", value: "DEAN" },
-        { label: "Ректор", value: "RECTOR" },
+        { label: "Администратор", value: "ADMIN" },
         { label: "Заведующий кафедрой", value: "HEAD_OF_THE_DEPARTMENT" }
       ];
 

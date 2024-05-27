@@ -1,52 +1,38 @@
-import React, { useContext, useState, useEffect } from "react"
-import { UserContext } from "../../context/UserContext.jsx"
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { modals } from '@mantine/modals';
-import {Paper,
-    TextInput,
-    PasswordInput,
-    Checkbox,
-    Button,
-    Title,
-    Text,
-    Anchor,
-    CloseButton, 
-    Box, 
-    Notification,
-     rem,
-     LoadingOverlay,
-    Select,
-    AppShell, Burger, Group, Skeleton, Table, Modal, FocusTrap, FileButton, Drawer, Flex, ActionIcon, NumberInput
-} from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import './Home.css'
-import { IconLogout, IconEdit, IconTrash } from '@tabler/icons-react';
-import { IconX, IconCheck } from '@tabler/icons-react';
-
-const text = "Отсутствие актов о нарушении санитарного состояния, пожарной безопасности, охраны труда и других актов противоправных действий (в том числе административные и уголовные преступления, нарушения правил внутреннего трудового распорядка, пропускного режима с использованием СКУД и иных) в отношении работников, обучающихся и проживающих в общежитиях (по факультету)"
-const elements = [
-    { position: text, mass: "Март", symbol: '0', name: '5%', ur: "устанавливается и выплачивается в месяце, следующем за отчетным", mur: "5"},
-    { position: 7, mass: 14.007, symbol: 'N', name: 'Nitrogen' },
-    { position: 39, mass: 88.906, symbol: 'Y', name: 'Yttrium' },
-    { position: 56, mass: 137.33, symbol: 'Ba', name: 'Barium' },
-    { position: 58, mass: 140.12, symbol: 'Ce', name: 'Cerium' },
-  ];
-
-const MONTHS = [
-    { label: "Январь", value: "Январь" },
-    { label: "Февраль", value: "Февраль" },
-    { label: "Март", value: "Март" },
-    { label: "Апрель", value: "Апрель" },
-    { label: "Май", value: "Май" },
-    { label: "Июнь", value: "Июнь" },
-    { label: "Июль", value: "Июль" },
-    { label: "Август", value: "Август" },
-    { label: "Сентябрь", value: "Сентябрь" },
-    { label: "Октябрь", value: "Октябрь" },
-    { label: "Ноябрь", value: "Ноябрь" },
-    { label: "Декабрь", value: "Декабрь" },
-  ];
-
+Компонент является основным строительным блоком пользовательского 
+интерфейса (UI). Каждый компонент сопоставлен с шаблоном (рисунок 4.1).
+Angular-компонент содержит свойства, методы, конструктор, а также входные 
+события, выходные события и методы жизненного цикла, такие как ngOnInit, 
+ngOnDestroy и т. д. Angular создает, обновляет и уничтожает компоненты при 
+перемещении пользователя по приложению.
+Важные свойства декоратора @Component: 
+Селектор (selector): имя, данное в этом свойстве, используется на HTML-странице 
+в качестве тега для загрузки этого компонента на экран. Например, чтобы загрузить 
+компонент с селектором app-percentages на экран, вам нужно использовать <apppercentages> на странице HTML.
+templateUrl : используется для сопоставления внешней HTML-страницы с этим 
+компонентом.
+styleUrls : используется для вставки списка файлов CSS, которые вы хотите 
+использовать для этого компонента [7].
+Реализация компонента PercentagesComponent представлена на рисунке 4.3.
+Данный компонент реализует интерфейс OnInit таким образом, чтобы при 
+инициализации компонента получить из локального хранилища уникальный 
+идентификатор текущего предмета и выполнить запрос на получение необходимых 
+данных с сервера.
+Метод retrievePercentages() предназначен для получения списка этапов 
+процентовки с сервера.
+Метод addStage() является обработчиком события клика по кнопке в шаблоне 
+компонента и используется для создания нового этапа процентовки.
+34
+Рисунок 4.3 – Реализация компонента PercentagesComponent
+Перечень всех компонентов приложения приведен на рисунке 4.4
+35
+Рисунок 4.4 – Перечень компонентов приложения
+Так как данное приложение является одностраничным, обмен данными с 
+сервером не требует обновления страницы в браузере. Поэтому необходимо каким-то 
+образом уведомлять пользователя, когда вызванные им операции выполняются. Для 
+этого будем использовать сервис MatSnackBar из пакета @angular/material. Код метода 
+для вывода сообщения на экран приведен на рисунке 4.5.
+Рисунок 4.5 – Код метода addFlashMessage()
+напиши такой текст для моего приложения:
 const Home = ({theme, setTheme}) => {
     const [userData, setUserData] = useContext(UserContext)
     const navigate = useNavigate()
@@ -555,7 +541,7 @@ const Home = ({theme, setTheme}) => {
                     </Table.Thead>                 
                     <Table.Tbody>{rows}</Table.Tbody>
                     <Table.Tbody>
-                        {rowsWithTotal}
+                        {rowsWithTotal} {/* Отображаем строки таблицы, включая строку с суммой */}
                     </Table.Tbody>
                 </Table>               
             </Table.ScrollContainer>      
@@ -568,3 +554,4 @@ const Home = ({theme, setTheme}) => {
 }
 
 export default Home
+а также есть страницы регистрации и авторизации
