@@ -58,6 +58,7 @@ async def _get_statistic_by_control_period(control_period, session) -> ResponseS
 
 async def _update_statistic(data, alias, session):
     statistic_dal = StatisticsDAL(session)
+    print(data)
     await statistic_dal.update_statistic(alias, **data)
 
 async def _deactivate_statistic(alias, session):

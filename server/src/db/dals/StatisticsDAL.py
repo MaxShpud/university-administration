@@ -35,8 +35,10 @@ class StatisticsDAL:
             created_at=now,
             user_id=user_id
         )
+        print(new_stat)
         self.db_session.add(new_stat)
         await self.db_session.commit()
+        await self.db_session.flush()
         return new_stat
 
     async def get_statistic_by_alias(self, alias
@@ -51,7 +53,7 @@ class StatisticsDAL:
     async def get_statistic_by_control_period(self, control_period
                                               ) -> Sequence[Statistics]:
         query = select(Statistics).where(
-            and_(Statistics.control_period == control_period, Statistics.active == True))
+            and_(Statistics.control_period == control_period, Statistics.active == True)).order_by(Statistics.created_at.asc())
         result = await self.db_session.execute(query)
         statistics = result.scalars().all()
         return statistics

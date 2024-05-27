@@ -34,13 +34,13 @@ class CreateStatistic(BaseModel):
 
 class ResponseStatistic(BaseModel):
     alias: UUID4 = Statistic.alias
-    indicators: str = Statistic.indicators
-    control_period: str = Statistic.control_period
-    value_of_indicators: str = Statistic.value_of_indicators
-    max_amount_of_additional_bonus: str = Statistic.max_amount_of_additional_bonus
-    note: str = Statistic.note
-    proposed_amount_of_additional_bonus: int = Statistic.proposed_amount_of_additional_bonus
-    user_id: int = Statistic.user_id
+    indicators: Optional[str] = Statistic.indicators
+    control_period: Optional[str]  = Statistic.control_period
+    value_of_indicators: Optional[str]  = Statistic.value_of_indicators
+    max_amount_of_additional_bonus: Optional[str]  = Statistic.max_amount_of_additional_bonus
+    note: Optional[str]  = Statistic.note
+    proposed_amount_of_additional_bonus: Optional[int]  = Statistic.proposed_amount_of_additional_bonus
+    user_id: Optional[int]  = Statistic.user_id
 
 
 class ResponseStatistics(BaseModel):

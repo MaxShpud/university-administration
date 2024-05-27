@@ -38,7 +38,7 @@ async def create_statistic(
             status_code=403,
             detail="Forbidden."
         )
-    print(body)
+
     statistic = await _create_statistic(body, current_user.id, db)
     return statistic
 

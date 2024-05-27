@@ -26,7 +26,7 @@ class Statistics(Base):
     value_of_indicators: Mapped[str] = mapped_column(nullable=True, comment='Значения показателей', default="")
     max_amount_of_additional_bonus: Mapped[str] = mapped_column(nullable=True, comment='Максимальный размер доп премии (в % от оклада)', default="")
     note: Mapped[str] = mapped_column(nullable=True, comment='Примечание', default="")
-    proposed_amount_of_additional_bonus: Mapped[int] = mapped_column(nullable=True, comment='Предпалагаемый размер дополнительной премии')
+    proposed_amount_of_additional_bonus: Mapped[int] = mapped_column(nullable=True, comment='Предпалагаемый размер дополнительной премии', default=None)
     active: Mapped[active]
     created_at: Mapped[created_at]
     deactivated_at: Mapped[deactivated_at]
